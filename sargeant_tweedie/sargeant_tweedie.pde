@@ -3,7 +3,7 @@ int numDots = 8000;
 
 ScreenBehaviour screenBehaviour;
 
-float changeTimeMS = 5000;
+float changeTimeMS = 100000;
 float changeTimeElapsed = 0;
 float lastFrameMS = 0;
 int iterations = 0;
@@ -24,7 +24,7 @@ void setup()
     dots[i] = new Dot(new PVector(x, y, z));
   }
 
-  assignNewBehaviour(1);
+  assignNewBehaviour(2);
 }
 
 void draw()
@@ -34,7 +34,7 @@ void draw()
   if (millis() - changeTimeElapsed > changeTimeMS)
   {
     //screenBehaviour = new ChaosScreenBehaviour(dots);
-    assignNewBehaviour();
+    assignNewBehaviour(2);
     iterations++;
     changeTimeElapsed = millis();
     print("Iterations: " + iterations);
