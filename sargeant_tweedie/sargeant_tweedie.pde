@@ -1,9 +1,11 @@
 Dot[] dots;
-int numDots = 8000;
+int numDots = 19200;
 
 ScreenBehaviour screenBehaviour;
 
-float changeTimeMS = 100000;
+float changeTimeMS = 10000;
+float shortChangeTimeMS = 1000;
+float longChangeTimeMS = 40000;
 float changeTimeElapsed = 0;
 float lastFrameMS = 0;
 int iterations = 0;
@@ -24,7 +26,7 @@ void setup()
     dots[i] = new Dot(new PVector(x, y, z));
   }
 
-  assignNewBehaviour(2);
+  assignNewBehaviour(3);
 }
 
 void draw()
@@ -34,7 +36,7 @@ void draw()
   if (millis() - changeTimeElapsed > changeTimeMS)
   {
     //screenBehaviour = new ChaosScreenBehaviour(dots);
-    assignNewBehaviour(2);
+    assignNewBehaviour();
     iterations++;
     changeTimeElapsed = millis();
     print("Iterations: " + iterations);
@@ -60,12 +62,19 @@ void assignNewBehaviour(int behaviourId)
    {
      case 0:
        screenBehaviour = new InOutScreenBehaviour(dots);
+       changeTimeMS = shortChangeTimeMS;
        break;
      case 1:
        screenBehaviour = new ChaosScreenBehaviour(dots);
+       changeTimeMS = shortChangeTimeMS;
        break;
      case 2:
        screenBehaviour = new CurvesScreenBehaviour(dots);
+       changeTimeMS = longChangeTimeMS;
+       break;
+     case 3:
+       screenBehaviour = new KinectScreenBehaviour(dots);
+       changeTimeMS = longChangeTimeMS;
        break;
      default:
        print("Failed to change behaviour");
