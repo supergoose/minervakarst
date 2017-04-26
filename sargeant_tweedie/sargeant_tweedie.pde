@@ -5,7 +5,7 @@ ScreenBehaviour screenBehaviour;
 
 float changeTimeMS = 10000;
 float shortChangeTimeMS = 1000;
-float longChangeTimeMS = 40000;
+float longChangeTimeMS = 30000; //40000;
 float changeTimeElapsed = 0;
 float lastFrameMS = 0;
 int iterations = 0;
@@ -26,7 +26,7 @@ void setup()
     dots[i] = new Dot(new PVector(x, y, z));
   }
 
-  assignNewBehaviour(3);
+  assignNewBehaviour(1);
 }
 
 void draw()
@@ -48,7 +48,7 @@ void draw()
 
 void assignNewBehaviour()
 {
-   int newBehaviourId = round(random(0, 2));
+   int newBehaviourId = round(random(0, 3));
    assignNewBehaviour(newBehaviourId);
 }
 
@@ -73,8 +73,9 @@ void assignNewBehaviour(int behaviourId)
        changeTimeMS = longChangeTimeMS;
        break;
      case 3:
-       screenBehaviour = new KinectScreenBehaviour(dots);
+       
        changeTimeMS = longChangeTimeMS;
+       screenBehaviour = new KinectScreenBehaviour(dots, changeTimeMS);
        break;
      default:
        print("Failed to change behaviour");
