@@ -17,6 +17,17 @@ class KinectEntryDotsBehaviour implements DotBehaviour
      this.startTimeMS = millis();
   }
   
+  public void resetStartTime()
+  {
+    this.startTimeMS = millis();
+  }
+  
+  public void setTargetPosition(PVector targetPosition)
+  {
+    this.targetPosition = targetPosition;
+  }
+
+  
   PVector calculateVelocity()
   {
      if(this.reachedTarget)this.velocity.y = 0;

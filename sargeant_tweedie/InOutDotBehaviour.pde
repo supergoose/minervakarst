@@ -12,11 +12,12 @@ class InOutDotBehaviour implements DotBehaviour{
   
   InOutDotBehaviour(PVector position, CircleBoundary boundary)
   {
+    //position.z = 0;
     this.position = position;
     this.boundary = boundary;
     
     this.direction = random(0,PI*2);
-    this.speed = 2;
+    this.speed = 4;
     
     this.velocity = this.calculateVelocity();
     

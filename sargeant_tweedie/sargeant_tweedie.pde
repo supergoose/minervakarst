@@ -1,10 +1,16 @@
+import org.openkinect.freenect.*;
+import org.openkinect.processing.*;
+
+// Kinect Library object
+Kinect kinect;
+
 Dot[] dots;
-int numDots = 19200;
+int numDots = 9600;
 
 ScreenBehaviour screenBehaviour;
 
-float changeTimeMS = 10000;
-float shortChangeTimeMS = 1000;
+float changeTimeMS = 50000; //10000;
+float shortChangeTimeMS = 10000;
 float longChangeTimeMS = 30000; //40000;
 float changeTimeElapsed = 0;
 float lastFrameMS = 0;
@@ -13,6 +19,8 @@ int iterations = 0;
 void setup()
 {
   size(1024, 768, P3D);
+  kinect = new Kinect(this);
+  kinect.initDepth();
   background(0);
   stroke(255);
 
@@ -36,7 +44,7 @@ void draw()
   if (millis() - changeTimeElapsed > changeTimeMS)
   {
     //screenBehaviour = new ChaosScreenBehaviour(dots);
-    assignNewBehaviour();
+    //assignNewBehaviour();
     iterations++;
     changeTimeElapsed = millis();
     print("Iterations: " + iterations);
@@ -53,7 +61,7 @@ void assignNewBehaviour()
 }
 
 void mouseClicked() {
-  assignNewBehaviour();
+  assignNewBehaviour(3);
 }
 
 void assignNewBehaviour(int behaviourId)
@@ -73,9 +81,8 @@ void assignNewBehaviour(int behaviourId)
        changeTimeMS = longChangeTimeMS;
        break;
      case 3:
-       
        changeTimeMS = longChangeTimeMS;
-       screenBehaviour = new KinectScreenBehaviour(dots, changeTimeMS);
+       screenBehaviour = new KinectScreenBehaviour(dots, kinect, changeTimeMS);
        break;
      default:
        print("Failed to change behaviour");

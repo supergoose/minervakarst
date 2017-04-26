@@ -38,7 +38,7 @@ class CurvesScreenBehaviour implements ScreenBehaviour{
            float targetY = tier*lineHeight - height/2;
            
            float targetX = random(0,width);
-           this.dots[dotId].setBehaviour(new CurvesDotBehaviour(this.dots[i].position, new PVector(targetX, targetY)));
+           this.dots[dotId].setBehaviour(new CurvesDotBehaviour(this.dots[i].position, new PVector(targetX, targetY, 0)));
            
            this.dotsTiered[i][j] = dots[dotId];
            dotId++;
