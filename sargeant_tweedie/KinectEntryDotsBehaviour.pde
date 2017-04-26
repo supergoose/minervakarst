@@ -9,6 +9,8 @@ class KinectEntryDotsBehaviour implements DotBehaviour
   float startTimeMS;
   
   float speed = 2;
+  
+  boolean exiting = false;
 
   KinectEntryDotsBehaviour(PVector position, PVector targetPosition)
   {
@@ -17,15 +19,14 @@ class KinectEntryDotsBehaviour implements DotBehaviour
      this.startTimeMS = millis();
   }
   
-  public void resetStartTime()
-  {
-    this.startTimeMS = millis();
-  }
-  
   public void setTargetPosition(PVector targetPosition)
   {
+    this.startTimeMS = millis();
     this.targetPosition = targetPosition;
+    timeToTargetMS = 20000.0f;
   }
+  
+  
 
   
   PVector calculateVelocity()

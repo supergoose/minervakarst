@@ -13,6 +13,7 @@ class KinectScreenBehaviour implements ScreenBehaviour
   int skip = 8;
   float spinDrawAngle = 0.0f;
   float zpos = 0.0f;
+  float xpos = width/2;
   float targetZpos = -2000.0f;
   float moveTime = 100000.0f;
   float startMoveTime = 0.0f;
@@ -26,6 +27,8 @@ class KinectScreenBehaviour implements ScreenBehaviour
   int[] depth;
   int[] lastDepth;
   float lastFrameTime;
+  int totalKinectPoints;
+  float targetSpinAngle;
   
   KinectScreenBehaviour(Dot[] dots, Kinect kinect, float duration)
    {
@@ -42,21 +45,40 @@ class KinectScreenBehaviour implements ScreenBehaviour
       
       this.duration = duration;// - moveTime/10;
       
-      
-      float colWidth = width/columns;
-      float rowHeight = height/rows;
-      
-      for(int i = 0; i < this.dots.length; i++)
-      {
-           float targetX = i%columns; 
-           float targetY = (i-targetX)/columns;
-           //random(0,width);
-           this.dots[i].setBehaviour(new KinectEntryDotsBehaviour(this.dots[i].position, new PVector(targetX*colWidth, targetY*rowHeight)));
-      }
-      
       startMoveTime = startTime =  millis();
       
       depth = kinect.getRawDepth();
+      int numP = 0;
+      for (int x = 0; x < kinect.width; x += skip) {
+          for (int y = 0; y < kinect.height; y += skip) {
+            
+            int offset = x + y*kinect.width;
+    
+            // Convert kinect data to world xyz coordinate
+            int rawDepth = depth[offset];
+            
+             PVector k = new PVector(x, y, rawDepth);
+              
+             if(rawDepth < depthCutoff)
+             {
+               PVector v = depthToWorld((int)k.x, (int)k.y, (int)k.z);
+               PVector thisPoint = new PVector(v.x*factor*k.z/spreadContinuity, v.y*factor*k.z/spreadContinuity, factor-v.z*zFactor);
+               this.dots[numP].setBehaviour(new KinectEntryDotsBehaviour(this.dots[numP].position, new PVector(thisPoint.x, thisPoint.y, thisPoint.z)));
+             }
+             numP++;
+            
+          }
+      }
+      
+      for(int i = 0; i < this.dots.length; i++)
+      {
+        if(this.dots[i].behaviour.getClass() != KinectEntryDotsBehaviour.class)
+        {
+          this.dots[i].setBehaviour(new KinectEntryDotsBehaviour(this.dots[i].position, new PVector(this.dots[i].position.x, height, random(0, 2048))));
+        }
+        
+      }
+      
    }
    
    void update()
@@ -69,25 +91,31 @@ class KinectScreenBehaviour implements ScreenBehaviour
    
    void draw()
    {
-      strokeWeight(2);     
-      float d = millis() - startMoveTime;
-      float b = millis() - startTime;
+      strokeWeight(2);    
+
+     float d = millis() - startMoveTime;
+     float b = millis() - startTime;
+     
+     if(d < this.duration/6)
+     {
+       beginShape(POINTS);
+       for(int i = 0; i < this.dots.length; i++)
+         {
+           vertex(this.dots[i].position.x, this.dots[i].position.y, this.dots[i].position.z);
+         }
+       endShape();
+     }else if (d < this.duration - this.duration/3){
+
+       if(zFactor < factor)zFactor ++;
+      
       float dt = millis() - lastFrameTime;
       lastFrameTime = millis();
-
-      if(d > this.duration - 10000)
-      {
-        targetZpos = 0.0f;
-        if(startTime == startMoveTime)startTime = millis();
-        
-        //Reduce the z scale
-      }else{
-        lastDepth = new int[depth.length];
-        if(d > moveTime)spinDrawAngle += 0.008f;
-        arrayCopy(depth, lastDepth);
-      }
       
-      zpos = lerp(zpos, targetZpos, b/moveTime);
+      lastDepth = new int[depth.length];
+      arrayCopy(depth, lastDepth);
+      spinDrawAngle += 0.008f;
+      
+      if(b/moveTime < 1)zpos = lerp(zpos, targetZpos, b/moveTime);
       
       translate(width/2, 0, zpos);
       rotateY(spinDrawAngle);
@@ -115,6 +143,7 @@ class KinectScreenBehaviour implements ScreenBehaviour
             {
               PVector v = depthToWorld((int)k.x, (int)k.y, (int)k.z);
               PVector thisPoint = new PVector(v.x*factor*k.z/spreadContinuity, v.y*factor*k.z/spreadContinuity, factor-v.z*zFactor);
+              this.dots[numP].position = thisPoint;
               vertex(thisPoint.x, thisPoint.y, thisPoint.z);
             }
             
@@ -122,10 +151,41 @@ class KinectScreenBehaviour implements ScreenBehaviour
           }
        }
        endShape();
-      
-      
-      
-      
+     }else{
+       float lpercent = (1-((this.duration - (millis()-this.startMoveTime))/10000)) ;
+       if(startTime == startMoveTime)startTime = millis();
+       zpos = lerp(zpos, 0, lpercent);
+       xpos = lerp(xpos, 0, lpercent);
+       if(targetSpinAngle==0)targetSpinAngle = ceil(spinDrawAngle/TWO_PI)*TWO_PI;
+       
+       spinDrawAngle = lerp(spinDrawAngle, targetSpinAngle, lpercent);
+       
+       translate(xpos, 0, zpos);
+       rotateY(spinDrawAngle);
+       beginShape(POINTS);
+       
+       
+       
+       for(int i = 0; i < this.dots.length; i++)
+       {
+         KinectEntryDotsBehaviour behaviour = (KinectEntryDotsBehaviour)this.dots[i].behaviour;
+         if(behaviour.targetPosition.z != 0)
+         {
+           float xPos = random(0,width);
+           float yPos = random(0,height);
+           float zPos = 0;
+           behaviour.setTargetPosition(new PVector(xPos, yPos, zPos));
+         }
+         
+         
+         
+         vertex(this.dots[i].position.x, this.dots[i].position.y, this.dots[i].position.z);
+       }
+
+       endShape();
+       
+     }
+     
       
       
    }

@@ -6,15 +6,15 @@ class CurvesScreenBehaviour implements ScreenBehaviour{
    int tiers = 80;
    
    int stage = 0;
-   float stageTimings[] = {4000, 500, 2000, 7000, 50000, 5000, 5000};
+   float stageTimings[] = {4000, 2000, 500, 4000, 5000, 50000, 5000, 5000};
    float lastStageTime = 0;
    float lineHeight;
    
-   int numPeaks = 15;
+   int numPeaks = 10;
    float offset[];
    float targetOffset[];
-   float minOffset = -200.0f;
-   float maxOffset = 200.0f;
+   float minOffset = -800.0f;
+   float maxOffset = 800.0f;
    int seed;
    float spinDrawAngle = 0.0f;
    
@@ -65,24 +65,28 @@ class CurvesScreenBehaviour implements ScreenBehaviour{
           drawPoints();
           break;
         case 1:
-          drawLines();
+        camera();
+          drawPoints();
           break;
         case 2:
+          drawLines();
+          break;
+        case 3:
         //We need to make curvy lines but only when we call the drawcurves function
           createCurves();
           drawCurves(0.0f, false);
           break;
-        case 3:
+        case 4:
           drawCurves(0.0f, true);
           break;
-        case 4:
+        case 5:
           spinDrawCurves();
           break;
-        case 5:
+        case 6:
           spinDrawAngle = 0.0f;
           drawCurves(0.0f, false);
           break;
-        case 6:
+        case 7:
           drawLines();
           break;
           
@@ -91,6 +95,7 @@ class CurvesScreenBehaviour implements ScreenBehaviour{
       if(millis()-lastStageTime > stageTimings[this.stage])
       {
         this.stage++;
+        print("Stage: " + this.stage);
         lastStageTime = millis();
         if(this.stage > this.stageTimings.length-1)this.stage = 0;
         
@@ -125,18 +130,20 @@ class CurvesScreenBehaviour implements ScreenBehaviour{
       {
         int tier = i%tiers;
         float targetY = tier*lineHeight - height/2;
-        vertex(0, targetY, this.dotsTiered[i][0].position.z);
-        vertex(width, targetY, this.dotsTiered[i][0].position.z);
+        vertex(0, targetY, 0);
+        vertex(width, targetY, 0);
         
       }
       endShape();
+      
+      stroke(255);
    }
    
    void createCurves()
    {  
       
       curvylines = new CurvyLine[tiers];
-      float targetZ = this.dotsTiered[0][0].position.z;
+      float targetZ = 0;
       
       int ranSeed = floor(random(1, 11000));
       
@@ -180,7 +187,7 @@ class CurvesScreenBehaviour implements ScreenBehaviour{
           midBeziers[j] = new BezierPoint(midpoint, preAnchor, postAnchor);
           priorPoint = midpoint;
           
-          targetPositions[j] = new PVector(0,0,noise(j*20)*(maxOffset - minOffset)+minOffset);
+          targetPositions[j] = new PVector(0,0,noise((float)j/10.0f)*(maxOffset - minOffset)+minOffset);
         }
         
         PVector endpoint = new PVector(width, targetY, targetZ);
@@ -221,6 +228,8 @@ class CurvesScreenBehaviour implements ScreenBehaviour{
 
       }
       
+      stroke(255);
+      
    }
    
    void spinDrawCurves()
@@ -230,7 +239,9 @@ class CurvesScreenBehaviour implements ScreenBehaviour{
       drawCurves(-height/2, true);
       spinDrawAngle += 0.008f;
       if(spinDrawAngle > PI*2){
+        
         this.stage++;
+        print("Stage: " + this.stage);
         lastStageTime = millis();
       }
    }
@@ -292,7 +303,7 @@ class CurvyLine
       priorPoint = currentPoint;
     }        
 
-    bezierVertex(priorPoint.postAnchor.x, priorPoint.postAnchor.y+yPosition, priorPoint.postAnchor.z, this.endpoint.preAnchor.x, this.endpoint.preAnchor.y, this.endpoint.preAnchor.z, this.endpoint.position.x, this.endpoint.position.y+yPosition, this.endpoint.position.z);
+    bezierVertex(priorPoint.postAnchor.x, priorPoint.postAnchor.y+yPosition, priorPoint.postAnchor.z, this.endpoint.preAnchor.x, this.endpoint.preAnchor.y+yPosition, this.endpoint.preAnchor.z, this.endpoint.position.x, this.endpoint.position.y+yPosition, this.endpoint.position.z);
 
     endShape();
     

@@ -5,13 +5,13 @@ import org.openkinect.processing.*;
 Kinect kinect;
 
 Dot[] dots;
-int numDots = 9600;
+int numDots = 9000;
 
 ScreenBehaviour screenBehaviour;
 
-float changeTimeMS = 50000; //10000;
-float shortChangeTimeMS = 10000;
-float longChangeTimeMS = 30000; //40000;
+float changeTimeMS = 30000; //10000;
+float shortChangeTimeMS = 30000;
+float longChangeTimeMS = 55000; //40000;
 float changeTimeElapsed = 0;
 float lastFrameMS = 0;
 int iterations = 0;
@@ -19,6 +19,7 @@ int iterations = 0;
 void setup()
 {
   size(1024, 768, P3D);
+//size(displayWidth, displayHeight, P3D); 
   kinect = new Kinect(this);
   kinect.initDepth();
   background(0);
@@ -34,8 +35,10 @@ void setup()
     dots[i] = new Dot(new PVector(x, y, z));
   }
 
-  assignNewBehaviour(1);
+  assignNewBehaviour(2);
 }
+
+
 
 void draw()
 {
@@ -44,7 +47,7 @@ void draw()
   if (millis() - changeTimeElapsed > changeTimeMS)
   {
     //screenBehaviour = new ChaosScreenBehaviour(dots);
-    //assignNewBehaviour();
+    assignNewBehaviour();
     iterations++;
     changeTimeElapsed = millis();
     print("Iterations: " + iterations);
@@ -61,7 +64,7 @@ void assignNewBehaviour()
 }
 
 void mouseClicked() {
-  assignNewBehaviour(3);
+  assignNewBehaviour();
 }
 
 void assignNewBehaviour(int behaviourId)
