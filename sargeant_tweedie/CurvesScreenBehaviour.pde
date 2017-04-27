@@ -123,7 +123,6 @@ class CurvesScreenBehaviour implements ScreenBehaviour{
    void drawLines()
    {
      strokeWeight(1);      
-     stroke(100);
       beginShape(LINES);
       int dotId = 0;
       for(int i = 0; i < tiers; i++)
@@ -135,8 +134,6 @@ class CurvesScreenBehaviour implements ScreenBehaviour{
         
       }
       endShape();
-      
-      stroke(255);
    }
    
    void createCurves()
@@ -209,7 +206,6 @@ class CurvesScreenBehaviour implements ScreenBehaviour{
    void drawCurves(float yPosition, boolean moveOut)
    {
      strokeWeight(1);      
-     stroke(100);
      noFill();
       
       int dotId = 0;
@@ -227,8 +223,6 @@ class CurvesScreenBehaviour implements ScreenBehaviour{
         }
 
       }
-      
-      stroke(255);
       
    }
    

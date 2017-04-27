@@ -9,18 +9,21 @@ int numDots = 9000;
 
 ScreenBehaviour screenBehaviour;
 
-float changeTimeMS = 30000; //10000;
-float shortChangeTimeMS = 30000;
-float longChangeTimeMS = 55000; //40000;
+float speed = 0.2f;
+float changeTimeMS = 30000*speed; //10000;
+float shortChangeTimeMS = 30000*speed;
+float longChangeTimeMS = 120000*speed; //40000;
 float changeTimeElapsed = 0;
 float lastFrameMS = 0;
 int iterations = 0;
+int oldBehaviourId = 0;
 
 void setup()
 {
-  size(1024, 768, P3D);
-//size(displayWidth, displayHeight, P3D); 
+  //size(1024, 768, P3D);
+size(displayWidth, displayHeight, P3D); 
   kinect = new Kinect(this);
+  print("Kinect: " + kinect);
   kinect.initDepth();
   background(0);
   stroke(255);
@@ -35,7 +38,11 @@ void setup()
     dots[i] = new Dot(new PVector(x, y, z));
   }
 
-  assignNewBehaviour(2);
+  assignNewBehaviour(1);
+}
+
+boolean sketchFullScreen() {
+  return true;
 }
 
 
@@ -59,7 +66,11 @@ void draw()
 
 void assignNewBehaviour()
 {
-   int newBehaviourId = round(random(0, 3));
+   int newBehaviourId = 0;
+   while(newBehaviourId == oldBehaviourId)
+   {
+     newBehaviourId = floor(random(0, 3.9));
+   }
    assignNewBehaviour(newBehaviourId);
 }
 
@@ -69,6 +80,10 @@ void mouseClicked() {
 
 void assignNewBehaviour(int behaviourId)
 {
+  oldBehaviourId = behaviourId;
+  screenBehaviour = null;
+  System.gc();
+  print("Assigning behaviour");
    switch(behaviourId)
    {
      case 0:

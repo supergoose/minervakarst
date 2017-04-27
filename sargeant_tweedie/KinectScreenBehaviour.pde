@@ -1,5 +1,3 @@
-
-
 class KinectScreenBehaviour implements ScreenBehaviour
 {
   Dot dots[];
@@ -14,7 +12,7 @@ class KinectScreenBehaviour implements ScreenBehaviour
   float spinDrawAngle = 0.0f;
   float zpos = 0.0f;
   float xpos = width/2;
-  float targetZpos = -2000.0f;
+  float targetZpos = -1000.0f;
   float moveTime = 100000.0f;
   float startMoveTime = 0.0f;
   float duration;
@@ -33,7 +31,6 @@ class KinectScreenBehaviour implements ScreenBehaviour
   KinectScreenBehaviour(Dot[] dots, Kinect kinect, float duration)
    {
       this.dots = dots;
-      this.dotsTiered = new Dot[rows][columns];
       
       // Lookup table for all possible depth values (0 - 2047)
       for (int i = 0; i < depthLookUp.length; i++) {
@@ -51,6 +48,8 @@ class KinectScreenBehaviour implements ScreenBehaviour
       int numP = 0;
       for (int x = 0; x < kinect.width; x += skip) {
           for (int y = 0; y < kinect.height; y += skip) {
+            
+            if(numP >= this.dots.length)return;
             
             int offset = x + y*kinect.width;
     
@@ -70,12 +69,18 @@ class KinectScreenBehaviour implements ScreenBehaviour
           }
       }
       
-      for(int i = 0; i < this.dots.length; i++)
+      for(int i = numP; i < this.dots.length; i++)
       {
-        if(this.dots[i].behaviour.getClass() != KinectEntryDotsBehaviour.class)
-        {
-          this.dots[i].setBehaviour(new KinectEntryDotsBehaviour(this.dots[i].position, new PVector(this.dots[i].position.x, height, random(0, 2048))));
-        }
+        //if(this.dots[i].behaviour != null)
+        //{
+          //if(this.dots[i].behaviour.getClass() != KinectEntryDotsBehaviour.class)
+          //{
+            this.dots[i].setBehaviour(new KinectEntryDotsBehaviour(this.dots[i].position, new PVector(this.dots[i].position.x, height, random(0, 2048))));
+          //}
+        //}else{
+          //this.dots[i].setBehaviour(new KinectEntryDotsBehaviour(this.dots[i].position, new PVector(this.dots[i].position.x, height, random(0, 2048))));
+        //}
+        
         
       }
       
@@ -106,7 +111,7 @@ class KinectScreenBehaviour implements ScreenBehaviour
        endShape();
      }else if (d < this.duration - this.duration/3){
 
-       if(zFactor < factor)zFactor ++;
+       zFactor ++;
       
       float dt = millis() - lastFrameTime;
       lastFrameTime = millis();
@@ -164,11 +169,11 @@ class KinectScreenBehaviour implements ScreenBehaviour
        rotateY(spinDrawAngle);
        beginShape(POINTS);
        
-       
-       
        for(int i = 0; i < this.dots.length; i++)
        {
-         KinectEntryDotsBehaviour behaviour = (KinectEntryDotsBehaviour)this.dots[i].behaviour;
+         if(this.dots[i].behaviour.getClass() == KinectEntryDotsBehaviour.class)
+         {
+           KinectEntryDotsBehaviour behaviour = (KinectEntryDotsBehaviour)this.dots[i].behaviour;
          if(behaviour.targetPosition.z != 0)
          {
            float xPos = random(0,width);
@@ -176,10 +181,10 @@ class KinectScreenBehaviour implements ScreenBehaviour
            float zPos = 0;
            behaviour.setTargetPosition(new PVector(xPos, yPos, zPos));
          }
-         
-         
-         
+
          vertex(this.dots[i].position.x, this.dots[i].position.y, this.dots[i].position.z);
+         }
+         
        }
 
        endShape();
